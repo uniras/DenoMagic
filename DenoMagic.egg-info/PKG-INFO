@@ -1,5 +1,5 @@
 Metadata-Version: 2.1
-Name: DenoMagic
+Name: denomagic
 Version: 0.1.0
 Summary: Python package to run JavaScript/TypeScript(Deno backend) in Jupyter notebooks and Google Colab.
 Author: Uniras
@@ -40,9 +40,7 @@ Google Colabの場合は/contentディレクトリまたはGoogle DriveのColab 
 コードセルに以下のコードを貼り付けて実行しマジックコマンドを登録してください。カーネルやランタイムを再起動する度に再実行する必要があります。
 
 ```python
-# Google Colab用(denomagic.pyをアップロードしたパスに合わせて変更して下さい)
-import sys
-sys.path.append("/content/drive/MyDrive/Colab Notebooks")
+!pip install denomagic
 from denomagic import install_deno_colab, register_deno_magics
 
 # denoのインストール(Google Colab用、他の環境では無視されます

@@ -1,1 +1,1 @@
-DenoMagic
+denomagic

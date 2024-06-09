@@ -1,8 +1,8 @@
 README.md
 pyproject.toml
-DenoMagic/__init__.py
-DenoMagic/denomagic.py
-DenoMagic.egg-info/PKG-INFO
-DenoMagic.egg-info/SOURCES.txt
-DenoMagic.egg-info/dependency_links.txt
-DenoMagic.egg-info/top_level.txt
+denomagic/__init__.py
+denomagic/denomagic.py
+denomagic.egg-info/PKG-INFO
+denomagic.egg-info/SOURCES.txt
+denomagic.egg-info/dependency_links.txt
+denomagic.egg-info/top_level.txt
