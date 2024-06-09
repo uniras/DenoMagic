@@ -4,11 +4,6 @@
 
 Jypyter(notebook/lab)またはGoogle ColabのコードセルにDeno(JavaScript/TypeScript)を書いて実行するためのマジックコマンドです。
 
-## インストール
-
-denomagic.pyをダウンロードして、Jupyterの場合は使用するノートブックと同じディレクトリに、
-Google Colabの場合は/contentディレクトリまたはGoogle DriveのColab Notebooksディレクトリ(/content/drive/MyDrive/Colab Notebooks/)にアップロードしてください。
-
 ## 使い方
 
 ### マジックコマンドの追加
