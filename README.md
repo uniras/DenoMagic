@@ -17,12 +17,12 @@ Google Colabの場合は/contentディレクトリまたはGoogle DriveのColab 
 
 ```python
 %pip install denomagic
-from denomagic import install_deno_colab, register_deno_magics
+import denomagic
 
 # denoのインストール(Google Colab用、他の環境では無視されます
-install_deno_colab()
+denomagic.install_deno_colab()
 # マジックコマンドの登録
-register_deno_magics()
+denomagic.register_deno_magics()
 ```
 
 ### マジックコマンドの使い方
