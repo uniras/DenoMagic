@@ -16,7 +16,7 @@ Google Colabの場合は/contentディレクトリまたはGoogle DriveのColab 
 コードセルに以下のコードを貼り付けて実行しマジックコマンドを登録してください。カーネルやランタイムを再起動する度に再実行する必要があります。
 
 ```python
-!pip install denomagic
+%pip install denomagic
 from denomagic import install_deno_colab, register_deno_magics
 
 # denoのインストール(Google Colab用、他の環境では無視されます
