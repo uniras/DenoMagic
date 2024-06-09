@@ -6,6 +6,12 @@ Jypyter(notebook/lab)またはGoogle ColabのコードセルにDeno(JavaScript/T
 
 ## 使い方
 
+### インストール
+
+Jupyter環境ではあらかじめDenoをインストールしてパスを通しておく必要があります。インストール方法は[Denoの公式サイト](https://deno.com/)を参照してください。VSCode経由でJupyter(拡張機能)を使う場合はさらにDeno拡張機能をインストールしたうえで設定でDeno.enableをtrueにしてください。
+
+Google Colab環境ではパッケージにインストール用の関数が用意されているので個別にインストールする必要はありません。
+
 ### マジックコマンドの追加
 
 コードセルに以下のコードを貼り付けて実行しマジックコマンドを登録してください。カーネルやランタイムを再起動する度に再実行する必要があります。
@@ -14,7 +20,7 @@ Jypyter(notebook/lab)またはGoogle ColabのコードセルにDeno(JavaScript/T
 %pip install denomagic
 import denomagic
 
-# denoのインストール(Google Colab用、他の環境では無視されます
+# denoのインストール(Google Colab用、他の環境では呼び出してもインストールしません)
 denomagic.install_deno_colab()
 # マジックコマンドの登録
 denomagic.register_deno_magics()
