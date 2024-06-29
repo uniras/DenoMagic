@@ -1,3 +1,5 @@
 .venv
 dist/
 denomagic.egg-info/
+test/
+__pycache__/

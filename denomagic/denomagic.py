@@ -3,16 +3,9 @@ import shlex
 import base64
 import tempfile
 import os
-import IPython.display as display
-from IPython.core.magic import register_cell_magic
-
-
-# Denoコマンド
-def get_deno_cmd():
-    if is_google_colab():
-        return "/root/.deno/bin/deno"
-    else:
-        return "deno"
+import json
+import IPython.display as display  # type: ignore
+from IPython.core.magic import register_cell_magic  # type: ignore
 
 
 # Google Colabで実行しているかどうかを判定
@@ -22,6 +15,14 @@ def is_google_colab():
         return True
     except ImportError:
         return False
+
+
+# Denoコマンド
+def get_deno_cmd():
+    if is_google_colab():
+        return "/root/.deno/bin/deno"
+    else:
+        return "deno"
 
 
 def install_deno_colab():
@@ -52,7 +53,7 @@ def register_deno_magics():
     """
     Denoセルマジックコマンドを登録
     """
-    from IPython import get_ipython
+    from IPython import get_ipython  # type: ignore
     ipy = get_ipython()
     ipy.register_magic_function(run_deno)
     ipy.register_magic_function(run_deno_iframe)
@@ -67,6 +68,65 @@ def run_deno(line, cell):
     """
     Denoのコードを実行するマジックコマンド
     """
+    args = shlex.split(line)
+
+    useval = args[0] if len(args) > 0 else "False"
+
+    # Jupyterのユーザー変数を取得してDenoスクリプト内で使用可能にする
+    if useval.lower() == "true":
+        curdir = os.getcwd()
+        curdir = curdir.replace("\\", "/")
+
+        # Jupyterのユーザー変数を取得してJSONファイルに変換し、一時ファイルに保存
+        with tempfile.NamedTemporaryFile(dir=curdir, suffix=".json", delete=False) as json_file:
+            # IPythonのユーザー名前空間を取得
+            from IPython import get_ipython  # type: ignore
+            ipython = get_ipython()
+            variables = ipython.user_ns
+
+            # シリアライズ可能な変数のみをフィルタリング
+            def is_serializable(obj):
+                try:
+                    json.dumps(obj)
+                    return True
+                except (TypeError, OverflowError):
+                    return False
+
+            filtered_vars = {name: value for name, value in variables.items() if is_serializable(value)}
+
+            # JSON形式に変換
+            json_data = json.dumps(filtered_vars)
+            json_file.write(json_data.encode("utf-8"))
+            json_file_path = json_file.name
+
+            esc_json_file_path = json_file_path.replace("\\", "\\\\")
+
+        # Jupyterのグローバル変数を取得・変更・追加するDenoスクリプト
+        pre_script = f"""
+globalThis.isJupyterCell = true;
+globalThis.jupyter = JSON.parse(Deno.readTextFileSync('{esc_json_file_path}'));
+globalThis.jupyterExit = function(code = 0) {{
+    Deno.writeTextFileSync('{esc_json_file_path}', JSON.stringify(globalThis.jupyter));
+    Deno.exit(code);
+}}
+        """
+
+        after_script = """
+jupyterExit();
+        """
+
+    else:
+        pre_script = """
+globalThis.isJupyterCell = true;
+globalThis.jupyterExit = function(code = 0) {
+    Deno.exit(code);
+}
+        """
+
+        after_script = ""
+
+    cell = pre_script + cell + after_script
+
     # Denoコマンドを実行
     denocmd = get_deno_cmd()
     process = subprocess.Popen(
@@ -76,6 +136,21 @@ def run_deno(line, cell):
     )
 
     stdout, stderr = process.communicate()
+
+    if useval.lower() == "true":
+        # 一時JSONファイルからグローバル変数を復元
+        with open(json_file_path, "r") as f:
+            # IPythonのユーザー名前空間を取得
+            from IPython import get_ipython  # type: ignore
+            ipython = get_ipython()
+            variables = ipython.user_ns
+
+            external_data = json.load(f)
+
+            # user_nsを更新する
+            for key, value in external_data.items():
+                variables[key] = value
+        os.remove(json_file_path)
 
     # 結果を表示
     if process.returncode == 0:
@@ -188,7 +263,8 @@ console.log(code);
 def output_iframe(js_code, width, height, srcs, viewmode):
     # srcsで指定されたファイル群をScriptタグに変換
     if len(srcs) > 0:
-        src_tags = "\n".join([f'    <script src="{src}"></script>' for src in srcs])
+        src_tags = "\n".join([f"""    <script src="{src}"></script>""" for src in srcs])
+        src_tags = f"\n{src_tags}"
     else:
         src_tags = ""
 
@@ -198,8 +274,7 @@ def output_iframe(js_code, width, height, srcs, viewmode):
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-{src_tags}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">{src_tags}
 </head>
 <body>
     <div id="error" style="color: red; font-weight: bold; display: none;"></div>

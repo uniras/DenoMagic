@@ -82,8 +82,22 @@ new p5(sketch);
 
 #### %%run_deno
 
+```jupyter
+%%run_deno [userval]
+```
+
 コードセル内のJavaScript/TypeScriptをDenoで実行します。
-引数はありません。
+
+- userval: Jupyterのユーザー変数をDenoで利用するかどうかを設定します。デフォルトはFalseです。
+
+usevalをTrueにすると、Jupyterのユーザー変数を`globalThis.jupyter`を通じて利用できるようになり、セルを超えた変数のやりとりが出来るようになります。  
+内部ではJupyterとDenoの間をJSONの一時ファイルでやりとりしているため、JSONに変換できないオブジェクトは利用できません。  
+利用した場合の動作は未定義です。
+
+Jupyterのコードセル内で実行されている場合、`globalThis.isJupyterCell`が定義されているので、これが`undefined`ではないかどうかを確認することでJupyterのコードセルからの実行なのかどうかを判定できます。
+
+Jupyterユーザー変数を利用した状態でコードセルの途中で終了させたい場合はDeno.exitの代わりに`jupyterExit()`を利用してください。
+Deno.exitで終了するとJupyterのユーザー変数は更新されません。
 
 #### %%run_deno_iframe
 
